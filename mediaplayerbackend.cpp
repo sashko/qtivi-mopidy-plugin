@@ -193,7 +193,7 @@ void MediaPlayerBackend::seek(qint64 offset)
 void MediaPlayerBackend::setCurrentIndex(int index)
 {
     qDebug() << "setCurrentIndex: " << index;
-    m_tracklistController.index(index);
+    //    m_tracklistController.index(index);
 }
 
 void MediaPlayerBackend::setMuted(bool muted)
