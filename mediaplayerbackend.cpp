@@ -421,8 +421,6 @@ void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &
 {
     qDebug() << "onLibraryHelperTracksInDirectoryFetched";
     QStringList uris;
-    int currentFileIndex = 0;
-    int totalFileCount = uri.length();
 
     m_tracklistController.clear();
 
