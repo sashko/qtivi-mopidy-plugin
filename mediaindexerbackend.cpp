@@ -58,16 +58,7 @@ MediaIndexerBackend::MediaIndexerBackend(QSharedPointer<mopidy::JsonRpcHandler> 
     : QIviMediaIndexerControlBackendInterface(parent)
     , m_state(QIviMediaIndexerControl::Idle)
     , m_threadPool(new QThreadPool(this))
-{
-    m_libraryHelper.setJsonRpcHandler(jsonRpcHandler);
-
-    connect(&m_libraryHelper,
-            &mopidy::LibraryHelper::tracksInDirectoryFetched,
-            this,
-            &MediaIndexerBackend::onLibraryHelperTracksInDirectoryFetched);
-
-    m_libraryHelper.requestTracksInDirectory("file:///root/Music/");
-}
+{}
 
 void MediaIndexerBackend::initialize()
 {
@@ -145,24 +136,4 @@ void MediaIndexerBackend::setState(QIviMediaIndexerControl::State state)
 {
     m_state = state;
     emit stateChanged(state);
-}
-
-void MediaIndexerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &uri,
-                                                                  const mopidy::Refs &refs)
-{
-    qDebug() << "onLibraryHelperTracksInDirectoryFetched";
-
-    QStringList uris;
-    int currentFileIndex = 0;
-    int totalFileCount = uri.length();
-
-    m_tracklistController.clear();
-
-    for (auto ref : refs) {
-        qDebug() << ref.uri;
-        uris.append(ref.uri);
-    }
-
-    emit progressChanged(qreal(++currentFileIndex) / qreal(totalFileCount));
-    m_tracklistController.add(uris, 0);
 }

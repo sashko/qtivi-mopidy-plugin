@@ -47,6 +47,7 @@
 
 #include "mopidy/eventhandler.h"
 #include "mopidy/jsonrpchandler.h"
+#include "mopidy/libraryhelper.h"
 #include "mopidy/mixercontroller.h"
 #include "mopidy/playbackcontroller.h"
 #include "mopidy/tracklistcontroller.h"
@@ -85,6 +86,7 @@ public:
     void initialize() override;
 
 private:
+    mopidy::LibraryHelper m_libraryHelper;
     mopidy::EventHandler m_eventHandler;
     mopidy::MixerController m_mixerController;
     mopidy::PlaybackController m_playbackController;
@@ -109,7 +111,6 @@ private:
     void onStateReceived(mopidy::PlaybackState state);
 
     // Mopidy tracklist callbacks
-    void onTracksReceivedInitial(const mopidy::Tracks &tracks);
     void onTracksReceived(const mopidy::Tracks &tracks);
     void onCurrentIndexReceived(int index);
     void onSingleReceived(bool isSingle);
@@ -120,6 +121,7 @@ private:
     // Mopidy mixer callbacks
     void onMuteReceived(bool isMuted);
     void onVolumeReceived(int volume);
+    void onLibraryHelperTracksInDirectoryFetched(const QString &uri, const mopidy::Refs &refs);
 };
 
 #endif // MEDIAPLAYERBACKEND_MOPIDY_H

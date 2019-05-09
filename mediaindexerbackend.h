@@ -101,7 +101,6 @@ private:
 
     void scanNext();
     void setState(QIviMediaIndexerControl::State state);
-    void onLibraryHelperTracksInDirectoryFetched(const QString &uri, const mopidy::Refs &refs);
 };
 
 #endif // MEDIAINDEXERBACKEND_H

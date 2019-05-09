@@ -48,6 +48,7 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
                                        QObject *parent)
     : QIviMediaPlayerBackendInterface(parent)
 {
+    m_libraryHelper.setJsonRpcHandler(jsonRpcHandler);
     m_eventHandler.setJsonRpcHandler(jsonRpcHandler);
     m_mixerController.setJsonRpcHandler(jsonRpcHandler);
     m_playbackController.setJsonRpcHandler(jsonRpcHandler);
@@ -84,7 +85,7 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
     connect(&m_tracklistController,
             &mopidy::TracklistController::tracksReceived,
             this,
-            &MediaPlayerBackend::onTracksReceivedInitial);
+            &MediaPlayerBackend::onTracksReceived);
     connect(&m_tracklistController,
             &mopidy::TracklistController::singleReceived,
             this,
@@ -108,8 +109,14 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
             this,
             &MediaPlayerBackend::onVolumeReceived);
 
-    m_tracklistController.getTracks();
+    connect(&m_libraryHelper,
+            &mopidy::LibraryHelper::tracksInDirectoryFetched,
+            this,
+            &MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched);
+
     m_tracklistController.index();
+
+    m_libraryHelper.requestTracksInDirectory("file:///home/sashko/Music/");
 }
 
 void MediaPlayerBackend::initialize()
@@ -126,15 +133,6 @@ bool MediaPlayerBackend::canReportCount()
 void MediaPlayerBackend::fetchData(int start, int count)
 {
     qDebug() << "fetchData";
-    //    m_tracklistController.getTracks();
-
-    //    connect(&m_tracklistController, &mopidy::TracklistController::tracksReceived,
-    //            [this, start, count](const mopidy::Tracks &tracks) {
-    //        qDebug() << "fetchData processing";
-    //        m_trackList = tracks;
-    //        emit dataChanged(list, start, m_trackList.count());
-    //updateTracklist(start, count, OperationType::Select);
-    //    });
 }
 
 void MediaPlayerBackend::insert(int index, const QIviPlayableItem *item)
@@ -324,7 +322,6 @@ void MediaPlayerBackend::onTrackPlaybackStarted(const mopidy::TlTrack &tlTrack)
 void MediaPlayerBackend::onTracklistChanged()
 {
     qDebug() << "onTracklistChanged";
-    m_tracklistController.getTracks();
 }
 
 /*
@@ -334,9 +331,6 @@ void MediaPlayerBackend::onTracklistChanged()
 void MediaPlayerBackend::onCurrentIndexReceived(int index)
 {
     qDebug() << "onCurrentIndexReceived";
-
-    qDebug() << "current index: " << index;
-
     m_currentIndex = index;
 
     emit currentIndexChanged(m_currentIndex);
@@ -344,47 +338,11 @@ void MediaPlayerBackend::onCurrentIndexReceived(int index)
     emit durationChanged(0);
 }
 
-void MediaPlayerBackend::onTracksReceivedInitial(const mopidy::Tracks &tracks)
-{
-    qDebug() << "onTracksReceivedInitial";
-    int id = 0;
-    m_trackList.clear();
-    //    emit countChanged(m_trackList.count());
-    emit dataFetched(m_trackList, 0, false);
-
-    // disconnect as later this signal will be handled by onTracksReceived()
-    disconnect(&m_tracklistController,
-               &mopidy::TracklistController::tracksReceived,
-               this,
-               &MediaPlayerBackend::onTracksReceivedInitial);
-
-    // TODO: from and until count
-    for (auto track : tracks) {
-        QIviAudioTrackItem item;
-        qDebug() << "adding: " << track.name;
-
-        item.setId(QString(id++));
-        item.setTitle(track.name);
-        item.setArtist("artist");
-        item.setAlbum(track.album.name);
-        item.setUrl(track.uri);
-
-        m_trackList.append(QVariant::fromValue(item));
-    }
-
-    emit countChanged(m_trackList.count());
-    emit dataFetched(m_trackList, 0, false);
-
-    connect(&m_tracklistController,
-            &mopidy::TracklistController::tracksReceived,
-            this,
-            &MediaPlayerBackend::onTracksReceived);
-}
-
 void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
 {
     qDebug() << "OnTracksReceived()";
     int id = 0;
+
     m_trackList.clear();
     emit countChanged(m_trackList.count());
     emit dataFetched(m_trackList, 0, false);
@@ -403,7 +361,7 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
         m_trackList.append(QVariant::fromValue(item));
     }
 
-    //    emit countChanged(m_trackList.count());
+    emit countChanged(m_trackList.count());
     emit dataFetched(m_trackList, 0, false);
 }
 
@@ -456,4 +414,24 @@ void MediaPlayerBackend::onVolumeReceived(int volume)
 {
     qDebug() << "onVolumeReceived";
     emit setVolume(volume);
+}
+
+void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &uri,
+                                                                 const mopidy::Refs &refs)
+{
+    qDebug() << "onLibraryHelperTracksInDirectoryFetched";
+    QStringList uris;
+    int currentFileIndex = 0;
+    int totalFileCount = uri.length();
+
+    m_tracklistController.clear();
+
+    for (auto ref : refs) {
+        qDebug() << ref.uri;
+        uris.append(ref.uri);
+    }
+
+    m_tracklistController.add(uris, 0);
+
+    m_tracklistController.getTracks();
 }
