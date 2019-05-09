@@ -55,8 +55,6 @@
 #include <QFutureWatcher>
 #include <QQueue>
 
-QT_FORWARD_DECLARE_CLASS(QThreadPool);
-
 class MediaPlayerBackend;
 
 class MediaIndexerBackend : public QIviMediaIndexerControlBackendInterface
@@ -70,34 +68,9 @@ public:
     void pause() override;
     void resume() override;
 
-signals:
-    void indexingDone();
-
-public slots:
-    void addMediaFolder(const QString &path);
-    void removeMediaFolder(const QString &path);
-
-private slots:
-    bool scanWorker(const QString &mediaDir, bool removeData);
-    void onScanFinished();
-
 private:
-    int m_currentIndex;
-
-    struct ScanData
-    {
-        bool remove;
-        QString folder;
-    };
-
     mopidy::LibraryHelper m_libraryHelper;
     mopidy::TracklistController m_tracklistController;
-
-    QIviMediaIndexerControl::State m_state;
-    QQueue<ScanData> m_folderQueue;
-    QString m_currentFolder;
-    QFutureWatcher<bool> m_watcher;
-    QThreadPool *m_threadPool;
 
     void scanNext();
     void setState(QIviMediaIndexerControl::State state);

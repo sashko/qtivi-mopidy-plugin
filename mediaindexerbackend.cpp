@@ -56,84 +56,21 @@
 MediaIndexerBackend::MediaIndexerBackend(QSharedPointer<mopidy::JsonRpcHandler> jsonRpcHandler,
                                          QObject *parent)
     : QIviMediaIndexerControlBackendInterface(parent)
-    , m_state(QIviMediaIndexerControl::Idle)
-    , m_threadPool(new QThreadPool(this))
-{}
+{
+    (void) jsonRpcHandler;
+}
 
 void MediaIndexerBackend::initialize()
 {
-    emit stateChanged(m_state);
     emit initializationDone();
 }
 
 void MediaIndexerBackend::pause()
 {
-    static const QLatin1String error("SIMULATION: Pausing the indexing is not supported");
-    qCWarning(media) << error;
-    emit errorChanged(QIviAbstractFeature::InvalidOperation, error);
+    static const QLatin1String error("Pausing the indexing is not supported");
 }
 
 void MediaIndexerBackend::resume()
 {
-    static const QLatin1String error("SIMULATION: Resuming the indexing is not supported");
-    qCWarning(media) << error;
-    emit errorChanged(QIviAbstractFeature::InvalidOperation, error);
-}
-
-void MediaIndexerBackend::addMediaFolder(const QString &path)
-{
-    ScanData data;
-    data.remove = false;
-    data.folder = path;
-    m_folderQueue.append(data);
-
-    scanNext();
-}
-
-void MediaIndexerBackend::removeMediaFolder(const QString &path)
-{
-    ScanData data;
-    data.remove = true;
-    data.folder = path;
-    m_folderQueue.append(data);
-
-    scanNext();
-}
-
-bool MediaIndexerBackend::scanWorker(const QString &mediaDir, bool removeData)
-{
-    qDebug() << "scanWorker";
-}
-
-void MediaIndexerBackend::onScanFinished()
-{
-    if (!m_folderQueue.isEmpty()) {
-        scanNext();
-        return;
-    }
-
-    qCInfo(media) << "Scanning done";
-    emit progressChanged(1);
-    emit indexingDone();
-
-    //If the last run didn't succeed we will stay in the Error state
-    if (m_watcher.future().result())
-        setState(QIviMediaIndexerControl::Idle);
-}
-
-void MediaIndexerBackend::scanNext()
-{
-    if (m_watcher.isRunning())
-        return;
-
-    ScanData data = m_folderQueue.dequeue();
-    m_currentFolder = data.folder;
-    m_watcher.setFuture(
-        QtConcurrent::run(this, &MediaIndexerBackend::scanWorker, m_currentFolder, data.remove));
-}
-
-void MediaIndexerBackend::setState(QIviMediaIndexerControl::State state)
-{
-    m_state = state;
-    emit stateChanged(state);
+    static const QLatin1String error("Resuming the indexing is not supported");
 }
