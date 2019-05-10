@@ -259,7 +259,7 @@ void TracklistController::getRandom()
 
 void TracklistController::setRandom(bool random)
 {
-    sendNotification("set_random", {{"random", random}});
+    sendNotification("set_random", {{"value", random}});
 }
 
 void TracklistController::getRepeat()
@@ -270,7 +270,7 @@ void TracklistController::getRepeat()
 
 void TracklistController::setRepeat(bool repeat)
 {
-    sendNotification("set_repeat", {{"repeat", repeat}});
+    sendNotification("set_repeat", {{"value", repeat}});
 }
 
 void TracklistController::getSingle()
@@ -281,5 +281,5 @@ void TracklistController::getSingle()
 
 void TracklistController::setSingle(bool single)
 {
-    sendNotification("set_single", {{"single", single}});
+    sendNotification("set_single", {{"value", single}});
 }
