@@ -116,7 +116,7 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
 
     m_tracklistController.index();
 
-    m_libraryHelper.requestTracksInDirectory("file:///home/sashko/Music/");
+    m_libraryHelper.requestTracksInDirectory(MEDIA_FOLDER);
 }
 
 void MediaPlayerBackend::initialize()
