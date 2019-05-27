@@ -344,7 +344,6 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
     int id = 0;
 
     m_trackList.clear();
-    emit countChanged(m_trackList.count());
     emit dataFetched(m_trackList, 0, false);
 
     // TODO: from and until count
