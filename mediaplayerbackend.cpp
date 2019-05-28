@@ -54,7 +54,7 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
     m_playbackController.setJsonRpcHandler(jsonRpcHandler);
     m_tracklistController.setJsonRpcHandler(jsonRpcHandler);
 
-    m_positionTrackerTimer.setInterval(1000);
+    m_positionTrackerTimer.setInterval(500);
 
     connect(&m_positionTrackerTimer,
             &QTimer::timeout,
