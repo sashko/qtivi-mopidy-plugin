@@ -356,6 +356,10 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
         if (track.artists.size())
             item.setArtist(track.artists.first().name);
         item.setAlbum(track.album.name);
+        item.setDuration(track.length);
+        item.setGenre(track.genre);
+        item.setTrackNumber(track.track_no);
+        item.setYear(track.date.year());
         item.setUrl(track.uri);
 
         m_trackList.append(QVariant::fromValue(item));
