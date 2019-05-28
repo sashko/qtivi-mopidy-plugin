@@ -98,6 +98,8 @@ private:
 
     QVariantList m_trackList;
 
+    QTimer m_positionTrackerTimer;
+
     bool m_repeatMode;
     bool m_randomMode;
     bool m_singleMode;
@@ -111,6 +113,7 @@ private:
     void onTrackPlaybackStarted(const mopidy::TlTrack &tlTrack);
     void onTracklistChanged();
     void onStateReceived(mopidy::PlaybackState state);
+    void onTimePositionReceived(int timePosition);
 
     // Mopidy tracklist callbacks
     void onTracksReceived(const mopidy::Tracks &tracks);

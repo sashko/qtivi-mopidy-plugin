@@ -54,6 +54,14 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
     m_playbackController.setJsonRpcHandler(jsonRpcHandler);
     m_tracklistController.setJsonRpcHandler(jsonRpcHandler);
 
+    m_positionTrackerTimer.setInterval(1000);
+
+    connect(&m_positionTrackerTimer,
+            &QTimer::timeout,
+            [this]() {
+                m_playbackController.getTimePosition();
+            });
+
     // playback
     connect(&m_playbackController,
             &mopidy::PlaybackController::currentTlTrackReceived,
@@ -76,6 +84,10 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
             &mopidy::EventHandler::tracklistChanged,
             this,
             &MediaPlayerBackend::onTracklistChanged);
+    connect(&m_playbackController,
+            &mopidy::PlaybackController::timePositionReceived,
+            this,
+            &MediaPlayerBackend::onTimePositionReceived);
 
     // tracklist
     connect(&m_tracklistController,
@@ -265,6 +277,7 @@ void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
     case mopidy::PlaybackState::Paused:
         m_playbackState = QIviMediaPlayer::Paused;
         m_playbackController.getCurrentTlTrack();
+        m_positionTrackerTimer.stop();
         break;
 
     case mopidy::PlaybackState::Playing:
@@ -276,6 +289,7 @@ void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
     case mopidy::PlaybackState::Stopped:
         m_playbackState = QIviMediaPlayer::Stopped;
         emit positionChanged(0);
+        m_positionTrackerTimer.stop();
         break;
     }
 
@@ -322,6 +336,16 @@ void MediaPlayerBackend::onTrackPlaybackStarted(const mopidy::TlTrack &tlTrack)
 void MediaPlayerBackend::onTracklistChanged()
 {
     qDebug() << "onTracklistChanged";
+}
+
+void MediaPlayerBackend::onTimePositionReceived(int timePosition)
+{
+	qDebug() << "onTimePositionReceived";
+
+	if (!m_positionTrackerTimer.isActive())
+	    m_positionTrackerTimer.start();
+
+	emit positionChanged(timePosition);
 }
 
 /*
