@@ -353,7 +353,8 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
 
         item.setId(QString(id++));
         item.setTitle(track.name);
-        item.setArtist("artist");
+        if (track.artists.size())
+            item.setArtist(track.artists.first().name);
         item.setAlbum(track.album.name);
         item.setUrl(track.uri);
 
