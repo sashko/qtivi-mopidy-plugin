@@ -70,11 +70,9 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
 
     m_positionTrackerTimer.setInterval(500);
 
-    connect(&m_positionTrackerTimer,
-            &QTimer::timeout,
-            [this]() {
-                m_playbackController.getTimePosition();
-            });
+    connect(&m_positionTrackerTimer, &QTimer::timeout, [this]() {
+        m_playbackController.getTimePosition();
+    });
 
     // playback
     connect(&m_playbackController,
@@ -354,12 +352,12 @@ void MediaPlayerBackend::onTracklistChanged()
 
 void MediaPlayerBackend::onTimePositionReceived(int timePosition)
 {
-	qDebug() << "onTimePositionReceived";
+    qDebug() << "onTimePositionReceived";
 
-	if (!m_positionTrackerTimer.isActive())
-	    m_positionTrackerTimer.start();
+    if (!m_positionTrackerTimer.isActive())
+        m_positionTrackerTimer.start();
 
-	emit positionChanged(timePosition);
+    emit positionChanged(timePosition);
 }
 
 /*
