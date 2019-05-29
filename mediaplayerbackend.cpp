@@ -156,7 +156,8 @@ bool MediaPlayerBackend::canReportCount()
 
 void MediaPlayerBackend::fetchData(int start, int count)
 {
-    qDebug() << "fetchData";
+    qDebug() << "fetchData: "
+             << "from: " << start << ", count: " << count;
 }
 
 void MediaPlayerBackend::insert(int index, const QIviPlayableItem *item)
@@ -169,10 +170,11 @@ void MediaPlayerBackend::remove(int index)
     qDebug() << "remove: " << index;
 }
 
-void MediaPlayerBackend::move(int cur_index, int new_index)
+void MediaPlayerBackend::move(int curIndex, int newIndex)
 {
-    qDebug() << "move";
-    m_tracklistController.move(cur_index, cur_index, new_index);
+    qDebug() << "move: "
+             << "current: " << curIndex << ", new: " << newIndex;
+    m_tracklistController.move(curIndex, curIndex, newIndex);
 }
 
 void MediaPlayerBackend::next()
@@ -204,7 +206,7 @@ void MediaPlayerBackend::previous()
 
 void MediaPlayerBackend::seek(qint64 offset)
 {
-    qDebug() << "seek";
+    qDebug() << "seek: " << offset;
     connect(&m_playbackController,
             &mopidy::PlaybackController::timePositionReceived,
             [this, offset](int currentPosition) {
@@ -222,6 +224,7 @@ void MediaPlayerBackend::setCurrentIndex(int index)
 
 void MediaPlayerBackend::setMuted(bool muted)
 {
+    qDebug() << "setMuted: " << muted;
     m_mixerController.setMute(muted);
 }
 
@@ -229,40 +232,48 @@ void MediaPlayerBackend::setPlayMode(QIviMediaPlayer::PlayMode playMode)
 {
     switch (playMode) {
     case QIviMediaPlayer::Normal:
+        qDebug() << "setPlayMode: Normal";
         m_tracklistController.setSingle(false);
         m_tracklistController.setRepeat(false);
         m_tracklistController.setRandom(false);
         break;
 
     case QIviMediaPlayer::RepeatTrack:
+        qDebug() << "setPlayMode: RepeatTrack";
         m_tracklistController.setSingle(true);
         m_tracklistController.setRepeat(true);
         m_tracklistController.setRandom(false);
         break;
 
     case QIviMediaPlayer::RepeatAll:
+        qDebug() << "setPlayMode: RepeatAll";
         m_tracklistController.setSingle(false);
         m_tracklistController.setRepeat(true);
         m_tracklistController.setRandom(false);
         break;
 
     case QIviMediaPlayer::Shuffle:
+        qDebug() << "setPlayMode: Shuffle";
         m_tracklistController.setSingle(false);
         m_tracklistController.setRepeat(false);
         m_tracklistController.setRandom(true);
+        break;
+
+    default:
+        qWarning() << "setPlayMode: unsupported mode";
         break;
     };
 }
 
 void MediaPlayerBackend::setPosition(qint64 position)
 {
-    qDebug() << "setPosition";
+    qDebug() << "setPosition: " << position;
     m_playbackController.seek(position);
 }
 
 void MediaPlayerBackend::setVolume(int volume)
 {
-    qDebug() << "setVolume";
+    qDebug() << "setVolume: " << volume;
     m_mixerController.setVolume(volume);
 }
 
@@ -284,24 +295,30 @@ void MediaPlayerBackend::onCurrentTlTrackReceived(const mopidy::TlTrack &tlTrack
 
 void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
 {
-    qDebug() << "onStateReceived";
     switch (state) {
     case mopidy::PlaybackState::Paused:
+        qDebug() << "onStateReceived: Paused";
         m_playbackState = QIviMediaPlayer::Paused;
         m_playbackController.getCurrentTlTrack();
         m_positionTrackerTimer.stop();
         break;
 
     case mopidy::PlaybackState::Playing:
+        qDebug() << "onStateReceived: Playing";
         m_playbackState = QIviMediaPlayer::Playing;
         m_playbackController.getCurrentTlTrack();
         m_playbackController.getTimePosition();
         break;
 
     case mopidy::PlaybackState::Stopped:
+        qDebug() << "onStateReceived: Stopped";
         m_playbackState = QIviMediaPlayer::Stopped;
         emit positionChanged(0);
         m_positionTrackerTimer.stop();
+        break;
+
+    default:
+        qWarning() << "onStateReceived: unsupported state";
         break;
     }
 
@@ -311,22 +328,28 @@ void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
 void MediaPlayerBackend::onPlaybackStateChanged(mopidy::PlaybackState oldState,
                                                 mopidy::PlaybackState newState)
 {
-    qDebug() << "onPlaybackStateChanged";
     switch (newState) {
     case mopidy::PlaybackState::Paused:
+        qDebug() << "onPlaybackStateChanged: Paused";
         m_playbackState = QIviMediaPlayer::Paused;
         m_playbackController.getCurrentTlTrack();
         break;
 
     case mopidy::PlaybackState::Playing:
+        qDebug() << "onPlaybackStateChanged: Playing";
         m_playbackState = QIviMediaPlayer::Playing;
         m_playbackController.getCurrentTlTrack();
         m_playbackController.getTimePosition();
         break;
 
     case mopidy::PlaybackState::Stopped:
+        qDebug() << "onPlaybackStateChanged: Stopped";
         m_playbackState = QIviMediaPlayer::Stopped;
         emit positionChanged(0);
+        break;
+
+    default:
+        qWarning() << "onPlaybackStateChanged: unsupported new state";
         break;
     }
 
@@ -335,7 +358,7 @@ void MediaPlayerBackend::onPlaybackStateChanged(mopidy::PlaybackState oldState,
 
 void MediaPlayerBackend::onSeeked(int timePosition)
 {
-    qDebug() << "onSeeked";
+    qDebug() << "onSeeked: " << timePosition;
     emit positionChanged(timePosition);
 }
 
@@ -352,7 +375,7 @@ void MediaPlayerBackend::onTracklistChanged()
 
 void MediaPlayerBackend::onTimePositionReceived(int timePosition)
 {
-    qDebug() << "onTimePositionReceived";
+    qDebug() << "onTimePositionReceived: " << timePosition;
 
     if (!m_positionTrackerTimer.isActive())
         m_positionTrackerTimer.start();
@@ -366,7 +389,7 @@ void MediaPlayerBackend::onTimePositionReceived(int timePosition)
 
 void MediaPlayerBackend::onCurrentIndexReceived(int index)
 {
-    qDebug() << "onCurrentIndexReceived";
+    qDebug() << "onCurrentIndexReceived: " << index;
     m_currentIndex = index;
 
     emit currentIndexChanged(m_currentIndex);
@@ -376,7 +399,7 @@ void MediaPlayerBackend::onCurrentIndexReceived(int index)
 
 void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
 {
-    qDebug() << "OnTracksReceived()";
+    qDebug() << "OnTracksReceived";
     int id = 0;
 
     m_trackList.clear();
@@ -467,21 +490,21 @@ void MediaPlayerBackend::changePlayMode()
 
 void MediaPlayerBackend::onSingleReceived(bool isSingle)
 {
-    qDebug() << "onSingleReceived";
+    qDebug() << "onSingleReceived: " << isSingle;
     m_singleMode = isSingle;
     changePlayMode();
 }
 
 void MediaPlayerBackend::onRepeatReceived(bool isRepeat)
 {
-    qDebug() << "onRepeatReceived";
+    qDebug() << "onRepeatReceived: " << isRepeat;
     m_repeatMode = isRepeat;
     changePlayMode();
 }
 
 void MediaPlayerBackend::onRandomReceived(bool isRandom)
 {
-    qDebug() << "onRandomReceived";
+    qDebug() << "onRandomReceived:" << isRandom;
     m_randomMode = isRandom;
     changePlayMode();
 }
@@ -492,13 +515,13 @@ void MediaPlayerBackend::onRandomReceived(bool isRandom)
 
 void MediaPlayerBackend::onMuteReceived(bool isMuted)
 {
-    qDebug() << "onMuteReceive";
+    qDebug() << "onMuteReceive: " << isMuted;
     emit setMuted(isMuted);
 }
 
 void MediaPlayerBackend::onVolumeReceived(int volume)
 {
-    qDebug() << "onVolumeReceived";
+    qDebug() << "onVolumeReceived: " << volume;
     emit setVolume(volume);
 }
 
