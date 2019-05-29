@@ -7,6 +7,12 @@ PLUGIN_CLASS_NAME = MopidyMediaPlugin
 
 QT += core ivicore ivimedia multimedia websockets
 
+qtConfig(system-taglib) {
+    QMAKE_USE += taglib
+} else:qtConfig(taglib) {
+    include($$PWD/../../../3rdparty/taglib/taglib.pri)
+}
+
 TEMPLATE = lib
 
 CONFIG += c++11

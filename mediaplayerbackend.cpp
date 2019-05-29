@@ -41,8 +41,22 @@
 ****************************************************************************/
 
 #include "mediaplayerbackend.h"
+#include "logging.h"
 
 #include <QDebug>
+#include <QImage>
+
+#ifndef QTIVI_NO_TAGLIB
+#include <attachedpictureframe.h>
+#include <fileref.h>
+#include <id3v2frame.h>
+#include <id3v2header.h>
+#include <id3v2tag.h>
+#include <mpegfile.h>
+#include <tag.h>
+#include <taglib.h>
+#include <tstring.h>
+#endif // QTIVI_NO_TAGLIB
 
 MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> jsonRpcHandler,
                                        QObject *parent)
@@ -372,13 +386,59 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
 
     // TODO: from and until count
     for (auto track : tracks) {
+#ifndef QTIVI_NO_TAGLIB
+        if (!track.uri.endsWith(QLatin1String("mp3")))
+            break;
+
+        // Extract cover art
+        // Cover art is stored in PNG file with an identical name to the one of
+        // the corresponding MP3 file
+        // If PNG file with an equivalent name is not present, we extract it from
+        // the MP3 file and save on the filesystem alongside the MP3 file
+        QString fileName = track.uri.right(track.uri.length() - 7); // remove "file://"
+        QString defaultCoverArtUrl = fileName + QStringLiteral(".png");
+        QString coverArtUrl;
+
+        TagLib::FileRef f(TagLib::FileName(QFile::encodeName(fileName)));
+
+        if (fileName.endsWith(QLatin1String("mp3"))) {
+            auto *file = static_cast<TagLib::MPEG::File *>(f.file());
+            TagLib::ID3v2::Tag *tag = file->ID3v2Tag(true);
+            TagLib::ID3v2::FrameList frameList = tag->frameList("APIC");
+
+            if (frameList.isEmpty()) {
+                qCWarning(media) << "No cover art was found";
+            } else if (!QFile::exists(defaultCoverArtUrl)) {
+                auto *coverImage = static_cast<TagLib::ID3v2::AttachedPictureFrame *>(
+                    frameList.front());
+
+                if (NULL == coverImage) {
+                    qWarning(media) << "Could not extract cover art";
+                    continue;
+                }
+
+                QImage coverQImg;
+                coverArtUrl = defaultCoverArtUrl;
+
+                coverQImg.loadFromData((const uchar *) coverImage->picture().data(),
+                                       coverImage->picture().size());
+                coverQImg.save(coverArtUrl, "PNG");
+            } else {
+                coverArtUrl = defaultCoverArtUrl;
+            }
+        }
+#endif // QTIVI_NO_TAGLIB
+
         QIviAudioTrackItem item;
-        qDebug() << "adding: " << track.name;
+        qDebug() << "Adding track: " << track.name;
 
         item.setId(QString(id++));
         item.setTitle(track.name);
         if (track.artists.size())
             item.setArtist(track.artists.first().name);
+#ifndef QTIVI_NO_TAGLIB
+        item.setCoverArtUrl(coverArtUrl);
+#endif
         item.setAlbum(track.album.name);
         item.setDuration(track.length);
         item.setGenre(track.genre);
