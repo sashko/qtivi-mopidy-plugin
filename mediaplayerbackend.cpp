@@ -290,7 +290,9 @@ void MediaPlayerBackend::stop()
 void MediaPlayerBackend::onCurrentTlTrackReceived(const mopidy::TlTrack &tlTrack)
 {
     qDebug() << "onCurrentTlTrackReceived";
+
     m_tracklistController.index();
+    emit durationChanged(tlTrack.track.length);
 }
 
 void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
@@ -394,7 +396,6 @@ void MediaPlayerBackend::onCurrentIndexReceived(int index)
 
     emit currentIndexChanged(m_currentIndex);
     emit currentTrackChanged(QVariant());
-    emit durationChanged(0);
 }
 
 void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
