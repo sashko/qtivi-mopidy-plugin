@@ -128,11 +128,12 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
             &mopidy::MixerController::muteReceived,
             this,
             &MediaPlayerBackend::onMuteReceived);
-    connect(&m_mixerController,
-            &mopidy::MixerController::volumeReceived,
+    connect(&m_eventHandler,
+            &mopidy::EventHandler::volumeChanged,
             this,
-            &MediaPlayerBackend::onVolumeReceived);
+            &MediaPlayerBackend::onVolumeChanged);
 
+    // library
     connect(&m_libraryHelper,
             &mopidy::LibraryHelper::tracksInDirectoryFetched,
             this,
@@ -520,10 +521,10 @@ void MediaPlayerBackend::onMuteReceived(bool isMuted)
     emit setMuted(isMuted);
 }
 
-void MediaPlayerBackend::onVolumeReceived(int volume)
+void MediaPlayerBackend::onVolumeChanged(int volume)
 {
-    qDebug() << "onVolumeReceived: " << volume;
-    emit setVolume(volume);
+    qDebug() << "onVolumeChanged: " << volume;
+    emit volumeChanged(volume);
 }
 
 void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &uri,

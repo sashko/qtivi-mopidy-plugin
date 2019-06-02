@@ -57,6 +57,7 @@ signals:
     void trackPlaybackStarted(const mopidy::TlTrack &tl_track);
     void tracklistChanged();
     void streamTitleChanged(const QString &title);
+    void volumeChanged(int volume);
 
 private:
     Q_DECLARE_PRIVATE(EventHandler)

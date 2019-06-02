@@ -125,7 +125,7 @@ private:
 
     // Mopidy mixer callbacks
     void onMuteReceived(bool isMuted);
-    void onVolumeReceived(int volume);
+    void onVolumeChanged(int volume);
     void onLibraryHelperTracksInDirectoryFetched(const QString &uri, const mopidy::Refs &refs);
 };
 

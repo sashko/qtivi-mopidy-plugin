@@ -81,6 +81,9 @@ void EventHandlerPrivate::onEventReceived(const QString &event, const QJsonObjec
         emit q->tracklistChanged();
     } else if (event == "stream_title_changed") {
         emit q->streamTitleChanged(params.value("title").toString());
+    } else if (event == "volume_changed") {
+        int volume = params.value("volume").toInt();
+        emit q->volumeChanged(volume);
     } else {
         qDebug() << __FUNCTION__ << QObject::tr("Unhandled event:") << event;
     }
