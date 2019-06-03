@@ -41,6 +41,7 @@
 ****************************************************************************/
 
 #include "mediaplugin.h"
+#include "logging.h"
 
 #include <QtIviCore/QIviSearchAndBrowseModel>
 #include <QtIviMedia/QIviMediaPlayer>
@@ -86,24 +87,24 @@ MopidyMediaPlugin::~MopidyMediaPlugin()
 
 void MopidyMediaPlugin::tryToConnect()
 {
-    qDebug() << "Connecting to mopidy";
+    qCInfo(media) << "Connecting to Mopidy...";
 
     m_mopidyClient.connectToServer();
 }
 
 void MopidyMediaPlugin::onClientConnected()
 {
-    qDebug() << "Connected to mopidy";
+    qCInfo(media) << "Connected to Mopidy";
 }
 
 void MopidyMediaPlugin::onClientDisconnected()
 {
-    qDebug() << "Disconnected from mopidy";
+    qCInfo(media) << "Disconnected from Mopidy";
 }
 
 void MopidyMediaPlugin::onConnectionError(int errCode, const QString &message)
 {
-    qDebug() << QString("%1 [%2]").arg(message).arg(errCode);
+    qCWarning(media) << Q_FUNC_INFO << QString("%1 [%2]").arg(message).arg(errCode);
 
     QTimer::singleShot(m_timerMsec, this, &MopidyMediaPlugin::tryToConnect);
 }
@@ -111,7 +112,7 @@ void MopidyMediaPlugin::onConnectionError(int errCode, const QString &message)
 void MopidyMediaPlugin::onJsonRpcError(mopidy::JsonRpcHandler::RpcErrorCode errCode,
                                        const QJsonObject &jsonRpcErrorObj)
 {
-    qDebug() << "JSON RPC Error: " << static_cast<int>(errCode) << jsonRpcErrorObj;
+    qCWarning(media) << "JSON RPC Error: " << static_cast<int>(errCode) << jsonRpcErrorObj;
 }
 
 QStringList MopidyMediaPlugin::interfaces() const

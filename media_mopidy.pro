@@ -13,6 +13,8 @@ qtConfig(system-taglib) {
     include($$PWD/../../../3rdparty/taglib/taglib.pri)
 }
 
+qtHaveModule(geniviextras):QT *= geniviextras
+
 TEMPLATE = lib
 
 CONFIG += c++11

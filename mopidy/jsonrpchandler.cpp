@@ -80,7 +80,6 @@ void JsonRpcHandlerPrivate::onClientConnected()
 
     while (!m_msgsQueue.isEmpty()) {
         QByteArray data = m_msgsQueue.dequeue();
-        qDebug() << data;
         ws->sendTextMessage(data);
     }
 }
