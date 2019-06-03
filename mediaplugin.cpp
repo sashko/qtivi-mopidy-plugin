@@ -52,6 +52,10 @@
 #include <QTemporaryFile>
 #include <QtDebug>
 
+#if defined(QT_GENIVIEXTRAS_LIB)
+#include <QtGeniviExtras/QtDlt>
+#endif
+
 MopidyMediaPlugin::MopidyMediaPlugin(QObject *parent)
     : QObject(parent)
 {
@@ -78,6 +82,10 @@ MopidyMediaPlugin::MopidyMediaPlugin(QObject *parent)
 
     m_player = new MediaPlayerBackend(jsonRpcHandler);
     m_indexer = new MediaIndexerBackend(jsonRpcHandler, m_player);
+
+#if defined(QT_GENIVIEXTRAS_LIB)
+    qInstallMessageHandler(QDltRegistration::messageHandler);
+#endif
 }
 
 MopidyMediaPlugin::~MopidyMediaPlugin()

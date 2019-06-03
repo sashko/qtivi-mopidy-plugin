@@ -13,7 +13,10 @@ qtConfig(system-taglib) {
     include($$PWD/../../../3rdparty/taglib/taglib.pri)
 }
 
-qtHaveModule(geniviextras):QT *= geniviextras
+qtHaveModule(geniviextras) {
+    QT += geniviextras
+    DEFINES += "QT_GENIVIEXTRAS_LIB"
+}
 
 TEMPLATE = lib
 

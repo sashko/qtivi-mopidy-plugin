@@ -44,4 +44,14 @@
 
 #include <QtIviCore/QIviFeatureInterface>
 
+#if defined(QT_GENIVIEXTRAS_LIB)
+#include <QtGeniviExtras/QtDlt>
+#endif
+
 Q_LOGGING_CATEGORY(media, "qt.ivi.media.media_mopidy")
+
+#if defined(QT_GENIVIEXTRAS_LIB)
+QDLT_REGISTER_APPLICATION("QIMM", "Qt IVI Mopidy media playback backend")
+
+QDLT_LOGGING_CATEGORY(media, "qt.ivi.media.media_mopidy", "FOO", "FOO CATEGORY")
+#endif

@@ -58,7 +58,7 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <QtWebSockets/QtWebSockets>
 
-#define MEDIA_FOLDER "file:///home/sashko/Music/"
+#define MEDIA_FOLDER "file:///home/root/Music/"
 
 class MediaPlayerBackend : public QIviMediaPlayerBackendInterface
 {
