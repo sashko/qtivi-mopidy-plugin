@@ -147,6 +147,9 @@ MediaPlayerBackend::MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> js
 void MediaPlayerBackend::initialize()
 {
     qDebug() << "initialize";
+
+    m_playbackController.getState();
+
     emit initializationDone();
 }
 
