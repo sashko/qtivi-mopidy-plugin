@@ -149,6 +149,7 @@ void MediaPlayerBackend::initialize()
     qDebug() << "initialize";
 
     m_playbackController.getState();
+    m_tracklistController.getTracks();
 
     emit initializationDone();
 }
@@ -545,5 +546,5 @@ void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &
 
     m_tracklistController.add(uris, 0);
 
-    m_tracklistController.getTracks();
+//    m_tracklistController.getTracks();
 }
