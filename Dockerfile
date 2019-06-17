@@ -11,7 +11,6 @@ RUN apt-get update && \
         git \
         locales \
         python \
-        sudo \
         unzip \
         wget \
         xz-utils
@@ -28,8 +27,6 @@ RUN ln -sf /bin/bash /bin/sh
 RUN useradd -U -m user
 RUN usermod --uid $UID user
 RUN groupmod --gid $GID user
-RUN adduser user sudo
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER user
 WORKDIR /home/user/

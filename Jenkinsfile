@@ -32,13 +32,13 @@ node("Component") {
         stage("Install Raspberry Pi SDK") {
             sh '''
             chmod +x pelux-glibc-x86_64-*.sh
-            sudo ./pelux-glibc-x86_64-*.sh -y -d /opt/pelux-sdk-x86_64/master
+            ./pelux-glibc-x86_64-*.sh -y -d ~/opt/pelux-sdk-x86_64/
             '''
         }
 
         stage("Build with Raspberry Pi SDK") {
             sh '''
-            source /opt/pelux-sdk-x86_64/master/environment-setup-cortexa7t2hf-neon-vfpv4-pelux-linux-gnueabi
+            source ~/opt/pelux-sdk-x86_64/environment-setup-cortexa7t2hf-neon-vfpv4-pelux-linux-gnueabi
             qmake
             nice make -j $(nproc)
             '''
