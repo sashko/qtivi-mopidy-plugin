@@ -16,7 +16,9 @@ node("Component") {
     }
 
     stage("Build Docker container") {
-        image = docker.build("qtivi-mopidy-plugin", "-f Dockerfile .")
+        image = docker.build("qtivi-mopidy-plugin", "--build-arg UID=\$(id -u) \
+                                                     --build-arg GID=\$(id -g) \
+                                                     -f Dockerfile .")
     }
 
     image.inside {

@@ -1,5 +1,8 @@
 FROM ubuntu:18.04
 
+ARG UID
+ARG GID
+
 # Install core dependencies
 RUN apt-get update && \
     apt-get install -qq -y --option=Dpkg::Options::=--force-confnew \
@@ -23,8 +26,8 @@ ENV LANG en_US.UTF8
 RUN ln -sf /bin/bash /bin/sh
 
 RUN useradd -U -m user
-RUN usermod --uid 1003 user
-RUN groupmod --gid 1003 user
+RUN usermod --uid $UID user
+RUN groupmod --gid $GID user
 RUN adduser user sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
