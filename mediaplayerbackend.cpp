@@ -167,6 +167,8 @@ void MediaPlayerBackend::fetchData(int start, int count)
 
 void MediaPlayerBackend::insert(int index, const QIviPlayableItem *item)
 {
+    Q_UNUSED(item);
+
     qDebug() << "insert: " << index;
 }
 
@@ -335,6 +337,8 @@ void MediaPlayerBackend::onStateReceived(mopidy::PlaybackState state)
 void MediaPlayerBackend::onPlaybackStateChanged(mopidy::PlaybackState oldState,
                                                 mopidy::PlaybackState newState)
 {
+    Q_UNUSED(oldState);
+
     switch (newState) {
     case mopidy::PlaybackState::Paused:
         qDebug() << "onPlaybackStateChanged: Paused";
@@ -371,6 +375,8 @@ void MediaPlayerBackend::onSeeked(int timePosition)
 
 void MediaPlayerBackend::onTrackPlaybackStarted(const mopidy::TlTrack &tlTrack)
 {
+    Q_UNUSED(tlTrack);
+
     qDebug() << "onEhTrackPlaybackStarted";
     m_tracklistController.index();
 }
@@ -534,6 +540,8 @@ void MediaPlayerBackend::onVolumeChanged(int volume)
 void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &uri,
                                                                  const mopidy::Refs &refs)
 {
+    Q_UNUSED(uri);
+
     qDebug() << "onLibraryHelperTracksInDirectoryFetched";
     QStringList uris;
 

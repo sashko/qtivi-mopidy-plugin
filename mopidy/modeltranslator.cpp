@@ -196,6 +196,9 @@ bool ModelTranslator::fromJson(const QJsonObject &jo, Ref &ref)
 
 bool ModelTranslator::fromJson(const QJsonObject &jo, PlaybackState &state)
 {
+    Q_UNUSED(jo);
+    Q_UNUSED(state);
+
     return false;
 }
 
