@@ -148,24 +148,41 @@ void MediaPlayerBackend::initialize()
 {
     qDebug() << "initialize";
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
+    emit canReportCountChanged(true);
+#endif
+
     m_playbackController.getState();
     m_tracklistController.getTracks();
 
     emit initializationDone();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
 bool MediaPlayerBackend::canReportCount()
 {
     return true;
 }
+#endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
 void MediaPlayerBackend::fetchData(int start, int count)
 {
+#else
+void MediaPlayerBackend::fetchData(const QUuid &identifier, int start, int count)
+{
+    m_identifier = identifier;
+#endif
+
     qDebug() << "fetchData: "
              << "from: " << start << ", count: " << count;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
 void MediaPlayerBackend::insert(int index, const QIviPlayableItem *item)
+#else
+void MediaPlayerBackend::insert(int index, const QVariant &item)
+#endif
 {
     Q_UNUSED(item);
 
@@ -415,7 +432,11 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
     int id = 0;
 
     m_trackList.clear();
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     emit dataFetched(m_trackList, 0, false);
+#else
+    emit dataFetched(m_identifier, m_trackList, 0, false);
+#endif
 
     // TODO: from and until count
     for (auto track : tracks) {
@@ -483,7 +504,11 @@ void MediaPlayerBackend::onTracksReceived(const mopidy::Tracks &tracks)
     }
 
     emit countChanged(m_trackList.count());
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     emit dataFetched(m_trackList, 0, false);
+#else
+    emit dataFetched(m_identifier, m_trackList, 0, false);
+#endif
 }
 
 void MediaPlayerBackend::changePlayMode()
@@ -554,5 +579,5 @@ void MediaPlayerBackend::onLibraryHelperTracksInDirectoryFetched(const QString &
 
     m_tracklistController.add(uris, 0);
 
-//    m_tracklistController.getTracks();
+    //    m_tracklistController.getTracks();
 }

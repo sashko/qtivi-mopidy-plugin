@@ -55,6 +55,7 @@
 #include <QtIviMedia/QIviMediaPlayerBackendInterface>
 
 #include <QtConcurrent/QtConcurrent>
+#include <QtGlobal>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtWebSockets/QtWebSockets>
 
@@ -68,9 +69,14 @@ public:
     MediaPlayerBackend(QSharedPointer<mopidy::JsonRpcHandler> jsonRpcHandler,
                        QObject *parent = nullptr);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     bool canReportCount() override;
     void fetchData(int start, int count) override;
     void insert(int index, const QIviPlayableItem *item) override;
+#else
+    void fetchData(const QUuid &identifier, int start, int count) override;
+    void insert(int index, const QVariant &item) override;
+#endif
     void remove(int index) override;
     void move(int cur_index, int new_index) override;
     void next() override;
@@ -97,6 +103,7 @@ private:
     QIviMediaPlayer::PlayState m_playbackState;
 
     QVariantList m_trackList;
+    QUuid m_identifier;
 
     QTimer m_positionTrackerTimer;
 
